@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<!-- saved from url=(0090)https://party.websim.ai/api/v1/sites/AP3Hk381zLBpxnaRV/html?origin=https%3A%2F%2Fwebsim.ai -->
+<html w-tid="0"><head w-tid="1"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999;padding:2px 0;box-shadow:#aaa 3px 3px 3px;background:#fff;margin:0;z-index:9999;overflow-y:auto;font:15px Verdana, sans-serif;box-sizing:border-box}.ctxmenu li{margin:1px 0;display:block;position:relative;user-select:none}.ctxmenu li.heading{font-weight:bold;margin-left:-5px}.ctxmenu li span{display:block;padding:2px 20px;cursor:default}.ctxmenu li a{color:inherit;text-decoration:none}.ctxmenu li.icon{padding-left:15px}.ctxmenu img.icon{position:absolute;width:18px;left:10px;top:2px}.ctxmenu li.disabled{color:#ccc}.ctxmenu li.divider{border-bottom:1px solid #aaa;margin:5px 0}.ctxmenu li.interactive:hover{background:rgba(0, 0, 0, .1)}.ctxmenu li.submenu::after{content:"";position:absolute;display:block;top:0;bottom:0;right:.4em;margin:auto .1rem auto auto;border-right:1px solid #000;border-top:1px solid #000;transform:rotate(45deg);width:.3rem;height:.3rem}.ctxmenu li.submenu.disabled::after{border-color:#ccc}</style><!--<base href="" w-tid="2">--><base href=".">
+<link rel="stylesheet" href="./fonts(1).css">
+<link rel="stylesheet" href="./ctxmenu.css">
+
+
+<title w-tid="3">Batalla Naval - Partida Rápida Mejorada</title>
+<style w-tid="4">
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #001f3f;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  header {
+    background-color: #0074D9;
+    padding: 1rem;
+    text-align: center;
+  }
+  main {
+    flex-grow: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1, h2 {
+    text-align: center;
+  }
+  .game-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 2rem;
+  }
+  .board-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(10, 30px);
+    grid-gap: 2px;
+    margin-bottom: 1rem;
+  }
+  .cell {
+    width: 30px;
+    height: 30px;
+    background-color: #0074D9;
+    border: 1px solid #7FDBFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  .cell:hover {
+    background-color: #39CCCC;
+  }
+  .hit {
+    background-color: #FF4136;
+  }
+  .miss {
+    background-color: #AAAAAA;
+  }
+  .ship {
+    background-color: #2ECC40;
+  }
+  .destroyed {
+    background-color: #FF4136;
+  }
+  .destroyed::after {
+    content: '🚩';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+  }
+  .chat-box {
+    width: 300px;
+    height: 400px;
+    background-color: #0074D9;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+  }
+  .chat-input {
+    display: flex;
+  }
+  .chat-input input {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 5px 0 0 5px;
+  }
+  .chat-input button {
+    padding: 0.5rem 1rem;
+    background-color: #2ECC40;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+  }
+  .status {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  .ship-counter {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+  }
+  footer {
+    background-color: #0074D9;
+    padding: 1rem;
+    text-align: center;
+    margin-top: auto;
+  }
+  #game-over {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  #game-over-content {
+    background-color: #0074D9;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+  }
+  #restart-button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #2ECC40;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .fire {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 30px solid #FF4136;
+    animation: flicker 0.5s infinite alternate;
+    z-index: 10;
+  }
+  @keyframes flicker {
+    0% {
+      opacity: 0.5;
+      transform: scaleY(0.8);
+    }
+    100% {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+</style>
+</head>
+<body w-tid="5">
+  <header w-tid="6">
+    <h1 w-tid="7">🚢 Batalla Naval - Partida Rápida Mejorada (10 Barcos)</h1>
+  </header>
+  
+  <main w-tid="8" class="">
+    <div id="status" class="status" w-tid="9">¡Oponente encontrado! La partida ha comenzado.</div>
+    
+    <div class="game-container" w-tid="10">
+      <div class="board-container" w-tid="11">
+        <h2 w-tid="12">Tu Tablero</h2>
+        <div class="board" id="player-board" w-tid="13"><div class="cell" data-id="0"></div><div class="cell ship" data-id="1"></div><div class="cell" data-id="2"></div><div class="cell" data-id="3"></div><div class="cell" data-id="4"></div><div class="cell" data-id="5"></div><div class="cell" data-id="6"></div><div class="cell" data-id="7"></div><div class="cell" data-id="8"></div><div class="cell" data-id="9"></div><div class="cell" data-id="10"></div><div class="cell ship" data-id="11"></div><div class="cell" data-id="12"></div><div class="cell ship" data-id="13"></div><div class="cell" data-id="14"></div><div class="cell" data-id="15"></div><div class="cell" data-id="16"></div><div class="cell ship" data-id="17"></div><div class="cell" data-id="18"></div><div class="cell" data-id="19"></div><div class="cell ship" data-id="20"></div><div class="cell ship" data-id="21"></div><div class="cell ship" data-id="22"></div><div class="cell ship" data-id="23"></div><div class="cell" data-id="24"></div><div class="cell" data-id="25"></div><div class="cell" data-id="26"></div><div class="cell ship" data-id="27"></div><div class="cell" data-id="28"></div><div class="cell" data-id="29"></div><div class="cell" data-id="30"></div><div class="cell" data-id="31"></div><div class="cell ship" data-id="32"></div><div class="cell" data-id="33"></div><div class="cell" data-id="34"></div><div class="cell" data-id="35"></div><div class="cell" data-id="36"></div><div class="cell ship" data-id="37"></div><div class="cell" data-id="38"></div><div class="cell" data-id="39"></div><div class="cell" data-id="40"></div><div class="cell" data-id="41"></div><div class="cell ship" data-id="42"></div><div class="cell" data-id="43"></div><div class="cell" data-id="44"></div><div class="cell" data-id="45"></div><div class="cell" data-id="46"></div><div class="cell ship" data-id="47"></div><div class="cell" data-id="48"></div><div class="cell" data-id="49"></div><div class="cell" data-id="50"></div><div class="cell" data-id="51"></div><div class="cell" data-id="52"></div><div class="cell" data-id="53"></div><div class="cell ship" data-id="54"></div><div class="cell ship" data-id="55"></div><div class="cell ship" data-id="56"></div><div class="cell ship" data-id="57"></div><div class="cell" data-id="58"></div><div class="cell ship" data-id="59"></div><div class="cell" data-id="60"></div><div class="cell" data-id="61"></div><div class="cell" data-id="62"></div><div class="cell ship" data-id="63"></div><div class="cell" data-id="64"></div><div class="cell" data-id="65"></div><div class="cell ship" data-id="66"></div><div class="cell" data-id="67"></div><div class="cell" data-id="68"></div><div class="cell ship" data-id="69"></div><div class="cell ship" data-id="70"></div><div class="cell" data-id="71"></div><div class="cell" data-id="72"></div><div class="cell ship" data-id="73"></div><div class="cell" data-id="74"></div><div class="cell" data-id="75"></div><div class="cell ship" data-id="76"></div><div class="cell" data-id="77"></div><div class="cell" data-id="78"></div><div class="cell ship" data-id="79"></div><div class="cell ship" data-id="80"></div><div class="cell" data-id="81"></div><div class="cell" data-id="82"></div><div class="cell ship" data-id="83"></div><div class="cell" data-id="84"></div><div class="cell" data-id="85"></div><div class="cell ship" data-id="86"></div><div class="cell" data-id="87"></div><div class="cell" data-id="88"></div><div class="cell" data-id="89"></div><div class="cell" data-id="90"></div><div class="cell" data-id="91"></div><div class="cell" data-id="92"></div><div class="cell ship" data-id="93"></div><div class="cell" data-id="94"></div><div class="cell" data-id="95"></div><div class="cell ship" data-id="96"></div><div class="cell" data-id="97"></div><div class="cell" data-id="98"></div><div class="cell" data-id="99"></div></div>
+        <div class="ship-counter" id="player-ships" w-tid="14">Tus barcos restantes: 10</div>
+      </div>
+      
+      <div class="board-container" w-tid="15">
+        <h2 w-tid="16">Tablero del Oponente</h2>
+        <div class="board" id="opponent-board" w-tid="17"><div class="cell" data-id="0"></div><div class="cell" data-id="1"></div><div class="cell" data-id="2"></div><div class="cell" data-id="3"></div><div class="cell" data-id="4"></div><div class="cell" data-id="5"></div><div class="cell" data-id="6"></div><div class="cell" data-id="7"></div><div class="cell" data-id="8"></div><div class="cell" data-id="9"></div><div class="cell" data-id="10"></div><div class="cell" data-id="11"></div><div class="cell" data-id="12"></div><div class="cell" data-id="13"></div><div class="cell" data-id="14"></div><div class="cell" data-id="15"></div><div class="cell" data-id="16"></div><div class="cell" data-id="17"></div><div class="cell" data-id="18"></div><div class="cell" data-id="19"></div><div class="cell" data-id="20"></div><div class="cell" data-id="21"></div><div class="cell" data-id="22"></div><div class="cell" data-id="23"></div><div class="cell" data-id="24"></div><div class="cell" data-id="25"></div><div class="cell" data-id="26"></div><div class="cell" data-id="27"></div><div class="cell" data-id="28"></div><div class="cell" data-id="29"></div><div class="cell" data-id="30"></div><div class="cell" data-id="31"></div><div class="cell" data-id="32"></div><div class="cell" data-id="33"></div><div class="cell" data-id="34"></div><div class="cell" data-id="35"></div><div class="cell" data-id="36"></div><div class="cell" data-id="37"></div><div class="cell" data-id="38"></div><div class="cell" data-id="39"></div><div class="cell" data-id="40"></div><div class="cell" data-id="41"></div><div class="cell" data-id="42"></div><div class="cell" data-id="43"></div><div class="cell" data-id="44"></div><div class="cell" data-id="45"></div><div class="cell" data-id="46"></div><div class="cell" data-id="47"></div><div class="cell" data-id="48"></div><div class="cell" data-id="49"></div><div class="cell" data-id="50"></div><div class="cell" data-id="51"></div><div class="cell" data-id="52"></div><div class="cell" data-id="53"></div><div class="cell" data-id="54"></div><div class="cell" data-id="55"></div><div class="cell" data-id="56"></div><div class="cell" data-id="57"></div><div class="cell" data-id="58"></div><div class="cell" data-id="59"></div><div class="cell" data-id="60"></div><div class="cell" data-id="61"></div><div class="cell" data-id="62"></div><div class="cell" data-id="63"></div><div class="cell" data-id="64"></div><div class="cell" data-id="65"></div><div class="cell" data-id="66"></div><div class="cell" data-id="67"></div><div class="cell" data-id="68"></div><div class="cell" data-id="69"></div><div class="cell" data-id="70"></div><div class="cell" data-id="71"></div><div class="cell" data-id="72"></div><div class="cell" data-id="73"></div><div class="cell" data-id="74"></div><div class="cell" data-id="75"></div><div class="cell" data-id="76"></div><div class="cell" data-id="77"></div><div class="cell" data-id="78"></div><div class="cell" data-id="79"></div><div class="cell" data-id="80"></div><div class="cell" data-id="81"></div><div class="cell" data-id="82"></div><div class="cell" data-id="83"></div><div class="cell" data-id="84"></div><div class="cell" data-id="85"></div><div class="cell" data-id="86"></div><div class="cell" data-id="87"></div><div class="cell" data-id="88"></div><div class="cell" data-id="89"></div><div class="cell" data-id="90"></div><div class="cell" data-id="91"></div><div class="cell" data-id="92"></div><div class="cell" data-id="93"></div><div class="cell" data-id="94"></div><div class="cell" data-id="95"></div><div class="cell" data-id="96"></div><div class="cell" data-id="97"></div><div class="cell" data-id="98"></div><div class="cell" data-id="99"></div></div>
+        <div class="ship-counter" id="opponent-ships" w-tid="18">Barcos enemigos restantes: 10</div>
+      </div>
+      
+      <div class="chat-box" w-tid="19">
+        <div class="chat-messages" id="chat-messages" w-tid="20">
+          <p w-tid="21"><strong w-tid="22">Bot_IA:</strong> Bienvenido a la partida rápida con 10 barcos. ¡Buena suerte!</p>
+        <p><strong>Bot_IA:</strong> ¡La partida ha comenzado! Es tu turno de atacar.</p></div>
+        <div class="chat-input" w-tid="23">
+          <input type="text" id="chat-input" placeholder="Escribe un mensaje..." w-tid="24">
+          <button onclick="sendMessage()" w-tid="25">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer w-tid="26">
+    <p w-tid="27">Hecho por Germán A. Casco</p>
+  </footer>
+
+  <div id="game-over" w-tid="28">
+    <div id="game-over-content" w-tid="29">
+      <h2 id="game-over-message" w-tid="30"></h2>
+      <button id="restart-button" onclick="restartGame()" w-tid="31">Jugar de nuevo</button>
+    </div>
+  </div>
+
+  <script w-tid="32">
+    let playerShips = 10;
+    let opponentShips = 10;
+    let gameActive = true;
+    let playerShipLocations = [];
+    let opponentShipLocations = [];
+
+    function createBoard(boardId, isOpponent = false) {
+      const board = document.getElementById(boardId);
+      for (let i = 0; i < 100; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.id = i;
+        if (isOpponent) {
+          cell.addEventListener('click', () => handleAttack(cell));
+        }
+        board.appendChild(cell);
+      }
+    }
+
+    function placeShips(boardId, isOpponent = false) {
+      const ships = [5, 4, 4, 3, 3, 3, 2, 2, 2, 2];
+      const board = document.getElementById(boardId);
+      const shipLocations = [];
+      ships.forEach(size => {
+        let placed = false;
+        while (!placed) {
+          const start = Math.floor(Math.random() * 100);
+          const direction = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+          if (canPlaceShip(board, start, size, direction)) {
+            const shipCells = placeShip(board, start, size, direction, isOpponent);
+            shipLocations.push(shipCells);
+            placed = true;
+          }
+        }
+      });
+      return shipLocations;
+    }
+
+    function canPlaceShip(board, start, size, direction) {
+      const cells = [];
+      for (let i = 0; i < size; i++) {
+        const cell = direction === 'horizontal' ? start + i : start + i * 10;
+        if (cell >= 100 || (direction === 'horizontal' && Math.floor(cell / 10) !== Math.floor(start / 10))) {
+          return false;
+        }
+        cells.push(board.children[cell]);
+      }
+      return cells.every(cell => !cell.classList.contains('ship'));
+    }
+
+    function placeShip(board, start, size, direction, isOpponent) {
+      const shipCells = [];
+      for (let i = 0; i < size; i++) {
+        const cellIndex = direction === 'horizontal' ? start + i : start + i * 10;
+        const cell = board.children[cellIndex];
+        if (!isOpponent) {
+          cell.classList.add('ship');
+        }
+        shipCells.push(cellIndex);
+      }
+      return shipCells;
+    }
+
+    function handleAttack(cell) {
+      if (!gameActive || cell.classList.contains('hit') || cell.classList.contains('miss')) return;
+      const cellIndex = Array.from(cell.parentNode.children).indexOf(cell);
+      if (opponentShipLocations.some(ship => ship.includes(cellIndex))) {
+        cell.classList.add('hit');
+        addFireEffect(cell);
+        opponentShips--;
+        updateShipCounter('opponent-ships', opponentShips);
+        addChatMessage('Bot_IA', '¡Has acertado un barco enemigo!');
+        checkShipDestroyed(cellIndex, opponentShipLocations, 'opponent-board');
+        checkGameOver();
+      } else {
+        cell.classList.add('miss');
+        addChatMessage('Bot_IA', 'Tu ataque ha fallado.');
+      }
+      if (gameActive) {
+        setTimeout(enemyAttack, 1000);
+      }
+    }
+
+    function enemyAttack() {
+      if (!gameActive) return;
+      const playerBoard = document.getElementById('player-board');
+      let attacked = false;
+      while (!attacked) {
+        const cellIndex = Math.floor(Math.random() * 100);
+        const cell = playerBoard.children[cellIndex];
+        if (!cell.classList.contains('hit') && !cell.classList.contains('miss')) {
+          if (cell.classList.contains('ship')) {
+            cell.classList.add('hit');
+            addFireEffect(cell);
+            playerShips--;
+            updateShipCounter('player-ships', playerShips);
+            addChatMessage('Bot_IA', '¡El enemigo ha acertado uno de tus barcos!');
+            checkShipDestroyed(cellIndex, playerShipLocations, 'player-board');
+            checkGameOver();
+          } else {
+            cell.classList.add('miss');
+            addChatMessage('Bot_IA', 'El ataque enemigo ha fallado.');
+          }
+          attacked = true;
+        }
+      }
+    }
+
+    function checkShipDestroyed(hitCellIndex, shipLocations, boardId) {
+      const board = document.getElementById(boardId);
+      
+      for (let ship of shipLocations) {
+        if (ship.includes(hitCellIndex)) {
+          if (ship.every(cellIndex => board.children[cellIndex].classList.contains('hit'))) {
+            ship.forEach(cellIndex => {
+              board.children[cellIndex].classList.add('destroyed');
+            });
+            addChatMessage('Bot_IA', '¡Un barco ha sido completamente destruido!');
+          }
+          break;
+        }
+      }
+    }
+
+    function addFireEffect(cell) {
+      const fire = document.createElement('div');
+      fire.className = 'fire';
+      cell.appendChild(fire);
+      setTimeout(() => {
+        fire.remove();
+      }, 2000);
+    }
+
+    function updateShipCounter(id, count) {
+      const counter = document.getElementById(id);
+      counter.textContent = id === 'player-ships' ? `Tus barcos restantes: ${count}` : `Barcos enemigos restantes: ${count}`;
+    }
+
+    function checkGameOver() {
+      if (playerShips === 0) {
+        endGame('¡Has perdido! Todos tus barcos han sido destruidos.');
+      } else if (opponentShips === 0) {
+        endGame('¡Has ganado! Has destruido todos los barcos enemigos.');
+      }
+    }
+
+    function endGame(message) {
+      gameActive = false;
+      document.getElementById('game-over-message').textContent = message;
+      document.getElementById('game-over').style.display = 'flex';
+      addChatMessage('Bot_IA', message);
+    }
+
+    function restartGame() {
+      window._ja6nndz9rv.reload();
+    }
+
+    function addChatMessage(sender, message) {
+      const chatMessages = document.getElementById('chat-messages');
+      const messageElement = document.createElement('p');
+      messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+      chatMessages.appendChild(messageElement);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const message = input.value.trim();
+      if (message) {
+        addChatMessage('Tú', message);
+        input.value = '';
+      }
+    }
+
+    function startGame() {
+      createBoard('player-board');
+      createBoard('opponent-board', true);
+      playerShipLocations = placeShips('player-board');
+      opponentShipLocations = placeShips('opponent-board', true);
+      
+      setTimeout(() => {
+        document.getElementById('status').textContent = '¡Oponente encontrado! La partida ha comenzado.';
+        addChatMessage('Bot_IA', '¡La partida ha comenzado! Es tu turno de atacar.');
+      }, 2000);
+    }
+
+    startGame();
+  </script>
+
+</body></html>
